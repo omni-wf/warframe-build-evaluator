@@ -1,0 +1,15 @@
+html, body, input, textarea, select, button
+{
+	color: #e8e6e3;
+	border-color: #736b5e;
+}
+
+html, body, input, textarea, select, button, dialog
+{
+	background-color: #181a1b;	
+}
+
+a
+{
+	color: #3391ff;
+}
