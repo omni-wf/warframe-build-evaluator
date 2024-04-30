@@ -784,6 +784,7 @@ export function calculate_damage(enemy, level, gear)
 	return {
 		normal = enemy_getEffectiveDamage(enemy, level, gear, gear.crit_fail_tier_damage),
 		crit = enemy_getEffectiveDamage(enemy, level, gear, gear.crit_tier_damage),
+		avg = enemy_getEffectiveDamage(enemy, level, gear, gear.crit_damage_avg),
 	}
 end
 

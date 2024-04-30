@@ -558,6 +558,11 @@ function add_to_simulator(name, dmgeval, outbuild_gear)
 		li.innerHTML = "Critical Damage: " + format_crit_value(dmgeval.crit.toFixed(2), outbuild_gear.crit_tier);
 		ul.appendChild(li);
 	}
+	{
+		let li = document.createElement("li");
+		li.innerHTML = "Average Damage: " + format_crit_value(dmgeval.avg.toFixed(2), outbuild_gear.crit_tier_chance > 0.5 ? outbuild_gear.crit_tier : outbuild_gear.crit_fail_tier);
+		ul.appendChild(li);
+	}
 	document.getElementById("simulator-body").appendChild(ul);
 }
 
