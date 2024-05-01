@@ -173,22 +173,22 @@ function ready_to_evaluate()
 	}
 }
 
-function tally_mods(elm)
+async function tally_mods(elm)
 {
 	let mods = [];
-	elm.forEach(input => {
+	for (const input of elm)
+	{
 		let key = get_key(input);
 		let rank_input = input.parentNode.querySelector("input[type='number']");
 		input.style.borderColor = "";
 		if (key)
 		{
-			pluto_invoke("get_max_rank", key).then(max_rank => {
-				if (rank_input.max != max_rank)
-				{
-					rank_input.max = max_rank;
-					rank_input.valueAsNumber = max_rank;
-				}
-			});
+			let max_rank = await pluto_invoke("get_max_rank", key);
+			if (rank_input.max != max_rank)
+			{
+				rank_input.max = max_rank;
+				rank_input.valueAsNumber = max_rank;
+			}
 			let rank = input.parentNode.querySelector("input[type='number']").valueAsNumber;
 			if (isNaN(rank))
 			{
@@ -205,17 +205,17 @@ function tally_mods(elm)
 				input.style.borderColor = "red";
 			}
 		}
-	});
+	}
 	return mods;
 }
 
-function evaluate_build()
+async function evaluate_build()
 {
 	let inbuild = {};
 
 	inbuild.powersuit = {
 		name: get_key(document.querySelector("input[list='datalist-powersuits']")),
-		mods: tally_mods(document.querySelectorAll("input[list='datalist-powersuit-mods']"))
+		mods: await tally_mods(document.querySelectorAll("input[list='datalist-powersuit-mods']"))
 	};
 	document.querySelectorAll("input[list='datalist-crystals']").forEach(input => {
 		let key = get_key(input);
@@ -232,17 +232,17 @@ function evaluate_build()
 
 	inbuild.primary = {
 		name: get_key(document.querySelector("input[list='datalist-primaries']")),
-		mods: tally_mods(document.querySelectorAll("input[list='datalist-primary-mods']"))
+		mods: await tally_mods(document.querySelectorAll("input[list='datalist-primary-mods']"))
 	};
 
 	inbuild.secondary = {
 		name: get_key(document.querySelector("input[list='datalist-secondaries']")),
-		mods: tally_mods(document.querySelectorAll("input[list='datalist-secondary-mods']"))
+		mods: await tally_mods(document.querySelectorAll("input[list='datalist-secondary-mods']"))
 	};
 
 	inbuild.melee = {
 		name: get_key(document.querySelector("input[list='datalist-melees']")),
-		mods: tally_mods(document.querySelectorAll("input[list='datalist-melee-mods']"))
+		mods: await tally_mods(document.querySelectorAll("input[list='datalist-melee-mods']"))
 	};
 
 	{
