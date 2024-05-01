@@ -1,1 +1,2 @@
-data-generator/
+data-generator/**
+!data-generator/exclude-mods.json
