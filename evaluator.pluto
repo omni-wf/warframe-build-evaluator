@@ -133,6 +133,7 @@ local function gear_getStats(gear, upgrade): table
 		end
 		case "WEAPON_CRIT_CHANCE" -> { "crit_chance" }
 		case "WEAPON_CRIT_DAMAGE" -> { "crit_damage" }
+		case "WEAPON_DOUBLE_CRIT_CHANCE" -> { "crit_enhance_chance" }
 		case "WEAPON_FIRE_RATE" -> { "fire_rate" }
 		case "WEAPON_MELEE_COMBO_DURATION_BONUS" -> { "combo_duration" }
 		default -> --[[print("Silently ignoring "..upgradeType) or]] {}
@@ -401,6 +402,7 @@ local function build_initGear(build, gear_name, gear_data)
 		dmgadd_corrosive = { base = 0 },
 		crit_chance = { base = gear_data.criticalChance },
 		crit_damage = { base = gear_data.criticalMultiplier },
+		crit_enhance_chance = { base = 0 },
 		fire_rate = { base = gear_data.fireRate },
 	}
 	if gear_data.EquippedBonuses then
@@ -688,11 +690,25 @@ local function finalise_dmg(gear)
 
 	gear.crit_fail_tier = gear.crit_chance // 1
 	gear.crit_tier = gear.crit_fail_tier + 1
-	gear.crit_tier_chance = gear.crit_chance % 1
 	gear.crit_tier_damage = 1 + (gear.crit_tier * (gear.crit_damage - 1))
-	gear.crit_fail_tier_chance = 1 - gear.crit_tier_chance
+	gear.crit_tier_chance = gear.crit_chance % 1
 	gear.crit_fail_tier_damage = 1 + (gear.crit_fail_tier * (gear.crit_damage - 1))
-	gear.crit_damage_avg = (gear.crit_tier_chance * gear.crit_tier_damage) + (gear.crit_fail_tier_chance * gear.crit_fail_tier_damage)
+	gear.crit_fail_tier_chance = 1 - gear.crit_tier_chance
+	gear.crit_enhance_tier = gear.crit_tier + 1
+	gear.crit_enhance_tier_damage = 1 + (gear.crit_enhance_tier * (gear.crit_damage - 1))
+
+	-- crit_enhance_tier_chance takes from crit_tier_chance
+	gear.crit_enhance_tier_chance = gear.crit_tier_chance * gear.crit_enhance_chance
+	gear.crit_tier_chance -= gear.crit_enhance_tier_chance
+
+	if gear.crit_fail_tier ~= 0 then
+		-- crit_enhance_chance takes from crit_fail_tier_chance to add to crit_tier_chance
+		local enhanced_fail_crit_chance = gear.crit_fail_tier_chance * gear.crit_enhance_chance
+		gear.crit_tier_chance += enhanced_fail_crit_chance
+		gear.crit_fail_tier_chance = gear.crit_fail_tier_chance * (1 - gear.crit_enhance_chance)
+	end
+
+	gear.crit_damage_avg = (gear.crit_tier_chance * gear.crit_tier_damage) + (gear.crit_fail_tier_chance * gear.crit_fail_tier_damage) + (gear.crit_enhance_chance * gear.crit_enhance_tier_damage)
 
 	gear.dmgadd_impact = nil
 	gear.dmgadd_puncture = nil
@@ -803,8 +819,8 @@ end
 export function calculate_damage(enemy, level, gear)
 	enemy = data.enemies[enemy] or error("Unknown enemy: "..enemy)
 	return {
-		normal = enemy_getEffectiveDamage(enemy, level, gear, gear.crit_fail_tier_damage),
-		crit = enemy_getEffectiveDamage(enemy, level, gear, gear.crit_tier_damage),
+		worst = enemy_getEffectiveDamage(enemy, level, gear, gear.crit_fail_tier_damage),
+		best = enemy_getEffectiveDamage(enemy, level, gear, gear.crit_enhance_chance > 0 ? gear.crit_enhance_tier_damage : gear.crit_tier_damage),
 		avg = enemy_getEffectiveDamage(enemy, level, gear, gear.crit_damage_avg),
 	}
 end

@@ -415,6 +415,12 @@ function add_gear_evaluation(ul, gear)
 		li.textContent = (gear.crit_chance * 100).toFixed(1) + "% Critical Chance";
 		{
 			let nested_ul = document.createElement("ul");
+			if (gear.crit_enhance_tier_chance)
+			{
+				let nested_li = document.createElement("li");
+				nested_li.innerHTML = (gear.crit_enhance_tier_chance * 100).toFixed(1) + "% Chance for " + format_crit_tier(gear.crit_enhance_tier) + " @ " + gear.crit_enhance_tier_damage.toFixed(1) + "x";
+				nested_ul.appendChild(nested_li);
+			}
 			{
 				let nested_li = document.createElement("li");
 				nested_li.innerHTML = (gear.crit_tier_chance * 100).toFixed(1) + "% Chance for " + format_crit_tier(gear.crit_tier) + " @ " + gear.crit_tier_damage.toFixed(1) + "x";
@@ -550,12 +556,12 @@ function add_to_simulator(name, dmgeval, outbuild_gear)
 	let ul = document.createElement("ul");
 	{
 		let li = document.createElement("li");
-		li.innerHTML = "Normal Damage: " + format_crit_value(dmgeval.normal.toFixed(2), outbuild_gear.crit_fail_tier);
+		li.innerHTML = "Worst Case Damage: " + format_crit_value(dmgeval.worst.toFixed(2), outbuild_gear.crit_fail_tier);
 		ul.appendChild(li);
 	}
 	{
 		let li = document.createElement("li");
-		li.innerHTML = "Critical Damage: " + format_crit_value(dmgeval.crit.toFixed(2), outbuild_gear.crit_tier);
+		li.innerHTML = "Best Case Damage: " + format_crit_value(dmgeval.best.toFixed(2), outbuild_gear.crit_enhance_tier_chance > 0 ? outbuild_gear.crit_enhance_tier : outbuild_gear.crit_tier);
 		ul.appendChild(li);
 	}
 	{

@@ -92,7 +92,7 @@ build_applyConditionals(build, {
 
 #### `calculate_damage(string enemy, int level, Outbuild.gear): table`
 
-The resulting table contains "normal" and "crit" fields for non-critical and critical damage, respectively.
+The resulting table contains "worst", "best" and "avg" fields with respect to critical chances.
 
 For example, to check the amount of damage dealt by a single Strun pellet with Point Blank R5 against a Lancer's body:
 
@@ -106,7 +106,7 @@ local outbuild = evaluate_build {
     }
 }
 local lancer = "/Lotus/Types/Enemies/Grineer/AIWeek/Avatars/RifleLancerAvatar"
-print(calculate_damage(lancer, 100, outbuild.primary).normal) -- 9.273...
+print(calculate_damage(lancer, 100, outbuild.primary).worst) -- 9.273...
 ```
 
 ### Compact Share
