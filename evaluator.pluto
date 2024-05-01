@@ -221,6 +221,22 @@ local function build_getStats(build, gear_name, upgrade)
 	return gear_name, stats
 end
 
+local function build_addConditionalUpgrade(build, conditional: string, upgrade)
+	if upgrade_gear_name := upgrade_type_to_gear_name(upgrade.UpgradeType) then
+		local stats = gear_getStats(build[upgrade_gear_name], upgrade)
+		for pairs(stats) as stat_name do
+			if stat := build[upgrade_gear_name]?[stat_name] then
+				stat_addConditional(stat, {
+					type = conditional,
+					source = conditional,
+					operation = upgrade.OperationType,
+					value = upgrade.Value,
+				})
+			end
+		end
+	end
+end
+
 local function fusion_level_to_rank(qa): int
 	return switch qa do
 		case "QA_VERY_HIGH" -> 10
@@ -354,22 +370,22 @@ local function build_applyMod(build, gear_name: ?string, mod_name, mod, rank = 0
 	end
 end
 
-local function init_gear(pe_data)
-	return {
+local function build_initGear(build, gear_name, gear_data)
+	build[gear_name] = {
 		redirects = {},
-		dmg_impact = { base = pe_data.damagePerShot[1] },
-		dmg_puncture = { base = pe_data.damagePerShot[2] },
-		dmg_slash = { base = pe_data.damagePerShot[3] },
-		dmg_heat = { base = pe_data.damagePerShot[4] },
-		dmg_cold = { base = pe_data.damagePerShot[5] },
-		dmg_electricity = { base = pe_data.damagePerShot[6] },
-		dmg_toxin = { base = pe_data.damagePerShot[7] },
-		dmg_blast = { base = pe_data.damagePerShot[8] },
-		dmg_radiation = { base = pe_data.damagePerShot[9] },
-		dmg_gas = { base = pe_data.damagePerShot[10] },
-		dmg_magnetic = { base = pe_data.damagePerShot[11] },
-		dmg_viral = { base = pe_data.damagePerShot[12] },
-		dmg_corrosive = { base = pe_data.damagePerShot[13] },
+		dmg_impact = { base = gear_data.damagePerShot[1] },
+		dmg_puncture = { base = gear_data.damagePerShot[2] },
+		dmg_slash = { base = gear_data.damagePerShot[3] },
+		dmg_heat = { base = gear_data.damagePerShot[4] },
+		dmg_cold = { base = gear_data.damagePerShot[5] },
+		dmg_electricity = { base = gear_data.damagePerShot[6] },
+		dmg_toxin = { base = gear_data.damagePerShot[7] },
+		dmg_blast = { base = gear_data.damagePerShot[8] },
+		dmg_radiation = { base = gear_data.damagePerShot[9] },
+		dmg_gas = { base = gear_data.damagePerShot[10] },
+		dmg_magnetic = { base = gear_data.damagePerShot[11] },
+		dmg_viral = { base = gear_data.damagePerShot[12] },
+		dmg_corrosive = { base = gear_data.damagePerShot[13] },
 		dmgadd_impact = { base = 0 },
 		dmgadd_puncture = { base = 0 },
 		dmgadd_slash = { base = 0 },
@@ -383,10 +399,15 @@ local function init_gear(pe_data)
 		dmgadd_magnetic = { base = 0 },
 		dmgadd_viral = { base = 0 },
 		dmgadd_corrosive = { base = 0 },
-		crit_chance = { base = pe_data.criticalChance },
-		crit_damage = { base = pe_data.criticalMultiplier },
-		fire_rate = { base = pe_data.fireRate },
+		crit_chance = { base = gear_data.criticalChance },
+		crit_damage = { base = gear_data.criticalMultiplier },
+		fire_rate = { base = gear_data.fireRate },
 	}
+	if gear_data.EquippedBonuses then
+		for pairs(gear_data.EquippedBonuses) as upgrade do
+			build_addConditionalUpgrade(build, gear_data.uniqueName, upgrade)
+		end
+	end
 end
 
 export function parse_build(inbuild)
@@ -476,15 +497,15 @@ export function parse_build(inbuild)
 		end
 	end
 	if inbuild.primary?.name then
-		build.primary = init_gear(data.weapons[inbuild.primary.name] or error("Unknown primary: "..inbuild.primary.name))
+		build_initGear(build, "primary", data.weapons[inbuild.primary.name] or error("Unknown primary: "..inbuild.primary.name))
 	end
 	if inbuild.secondary?.name then
-		build.secondary = init_gear(data.weapons[inbuild.secondary.name] or error("Unknown secondary: "..inbuild.secondary.name))
+		build_initGear(build, "secondary", data.weapons[inbuild.secondary.name] or error("Unknown secondary: "..inbuild.secondary.name))
 	end
 	if inbuild.melee?.name then
-		local pe_data = data.weapons[inbuild.melee.name] or error("Unknown melee: "..inbuild.melee.name)
-		build.melee = init_gear(pe_data)
-		build.melee.combo_duration = { base = pe_data.comboDuration }
+		local gear_data = data.weapons[inbuild.melee.name] or error("Unknown melee: "..inbuild.melee.name)
+		build_initGear(build, "melee", gear_data)
+		build.melee.combo_duration = { base = gear_data.comboDuration }
 	end
 	local phoenix_talons_bonus = 0
 	if inbuild.operator?.phoenix_talons then
