@@ -257,5 +257,5 @@
 	"/Lotus/Weapons/CrewShip/ShrapnelShotgun/ShrapnelShotgunInnateDamageRandomMod": true,
 	"/Lotus/Weapons/CrewShip/CrewShipInnateDamageRandomMod": true,
 	"/Lotus/Weapons/CrewShip/CrewShipInnateFireRateRandomMod": true,
-	"/Lotus/Weapons/Grineer/KuvaLich/Upgrades/InnateDamageRandomMod": true,
+	"/Lotus/Weapons/Grineer/KuvaLich/Upgrades/InnateDamageRandomMod": true
 }
