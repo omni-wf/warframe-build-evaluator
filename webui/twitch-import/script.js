@@ -7,7 +7,7 @@ document.getElementById("import-btn").onclick = function()
 	}
 	busy = true;
 	document.getElementById("import-btn").textContent = "Importing...";
-	fetch("https://api.builds.wf/arsenal?account="+encodeURIComponent(document.querySelector("input[type='text']").value)+"&platform="+document.querySelector("select").value)
+	fetch("https://live.wfdata.io/arsenal?account="+encodeURIComponent(document.querySelector("input[type='text']").value)+"&platform="+document.querySelector("select").value)
 	.then(resp=>resp.json().then(data=>{
 		if (!data)
 		{
