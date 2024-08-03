@@ -1,4 +1,4 @@
-local evaluator = dofile("/evaluator.pluto")
+local evaluator = dofile("../evaluator.pluto")
 
 evaluator.init(js_invoke("get_data"))
 
