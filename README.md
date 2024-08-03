@@ -1,4 +1,4 @@
 # Warframe Build Evaluator
 
-- [Web UI](https://eval.builds.wf/webui/)
+- [Web UI](https://sainan.github.io/warframe-build-evaluator/webui/)
 - [Documentation for developers](API.md)
