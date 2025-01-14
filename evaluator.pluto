@@ -99,7 +99,7 @@ local function valid_type_to_gear_name(validType): ?string
 	end
 end
 
-local function gear_getStats(gear, upgrade): table
+local function gear_getStats(_gear, upgrade): table
 	return switch upgrade.UpgradeType do
 		case "AVATAR_HEALTH_MAX" -> { "health" }
 		case "AVATAR_ARMOUR" -> { "armor" }
