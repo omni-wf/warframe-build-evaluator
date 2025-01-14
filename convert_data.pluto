@@ -12,14 +12,6 @@ local function writefile(path, contents)
 	f:write(contents)
 end
 
-local function optimise_public_export(data)
-	local optimised = {}
-	for data as item do
-		optimised[item.uniqueName] = item
-	end
-	return optimised
-end
-
 local function export(data)
 	return string.dump(load("return "..exportvar(data)))
 end
